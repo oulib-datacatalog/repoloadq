@@ -20,7 +20,7 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     
     args:
       bag: name of bag to load
-      mmsid:
+      mmsid: MMS ID is needed to obtain MARC XML
       outformat - string representation of image format - default is "JPEG". 
                   Available Formats: http://pillow.readthedocs.io/en/3.4.x/handbook/image-file-formats.html
       scale - percentage to scale by represented as a decimal
@@ -32,9 +32,9 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     # Generate derivatives and store in s3 an local
     taskid = celery.send_task("imageq.tasks.tasks.derivative_generation",
                               kwargs={'bags': bag,
-                                      's3_bucket': 'ul-bagit',
-                                      's3_source': 'source',
-                                      's3_destination': 'derivative',
+                                      's3_bucket': s3_bucket,
+                                      's3_source': s3_source,
+                                      's3_destination': s3_derivative,
                                       'outformat': outformat,
                                       'filter': filter,
                                       'scale': scale,
