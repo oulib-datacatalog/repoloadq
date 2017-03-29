@@ -19,7 +19,7 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     Generate derivative of Bag and load into Islandora.
     
     args:
-      bag: URL pointing to json formatted recipe file
+      bag: name of bag to load
       mmsid:
       outformat - string representation of image format - default is "JPEG". 
                   Available Formats: http://pillow.readthedocs.io/en/3.4.x/handbook/image-file-formats.html
