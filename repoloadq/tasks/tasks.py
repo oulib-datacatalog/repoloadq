@@ -1,5 +1,6 @@
 from celery.task import task
 from celery import Celery
+from celery import signature
 
 import logging
 
@@ -9,8 +10,8 @@ s3_bucket = "ul-bagit"
 s3_source = "source"
 s3_derivative = "derivative"
 
-celery = Celery()
-celery.config_from_object("celeryconfig")
+#celery = Celery()
+#celery.config_from_object("celeryconfig")
 
 
 @task()
@@ -30,20 +31,20 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     """
 
     # Generate derivatives and store in s3 an local
-    taskid = celery.send_task("imageq.tasks.tasks.derivative_generation",
-                              kwargs={'bags': bag,
-                                      's3_bucket': s3_bucket,
-                                      's3_source': s3_source,
-                                      's3_destination': s3_derivative,
-                                      'outformat': outformat,
-                                      'filter': filter,
-                                      'scale': scale,
-                                      'crop': crop
-                                      }).id
+    taskid = signature("imageq.tasks.tasks.derivative_generation",
+                       kwargs={'bags': bag,
+                               's3_bucket': s3_bucket,
+                               's3_source': s3_source,
+                               's3_destination': s3_derivative,
+                               'outformat': outformat,
+                               'filter': filter,
+                               'scale': scale,
+                               'crop': crop
+                               }).delay().id
     # bag derivative
-    celery.send_task("recipewriterq.tasks.tasks.bag_derivatives", (taskid))
+    signature("recipewriterq.tasks.tasks.bag_derivatives", (taskid)).delay()
     # create recipe file
-    celery.send_task("recipewriterq.tasks.tasks.derivative_recipe", (taskid, mmsid))
+    signature("recipewriterq.tasks.tasks.derivative_recipe", (taskid, mmsid)).delay()
     # load into islandora
-    #celery.send_task("islandoraq.tasks.tasks.ingest_recipe", (url, collection)).get()
+    #signature("islandoraq.tasks.tasks.ingest_recipe", (url, collection)).delay.get()
     # delete working files
