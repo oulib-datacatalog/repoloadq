@@ -31,20 +31,23 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     """
 
     # Generate derivatives and store in s3 an local
-    taskid = signature("imageq.tasks.tasks.derivative_generation",
-                       kwargs={'bags': bag,
-                               's3_bucket': s3_bucket,
-                               's3_source': s3_source,
-                               's3_destination': s3_derivative,
-                               'outformat': outformat,
-                               'filter': filter,
-                               'scale': scale,
-                               'crop': crop
-                               }).delay().id
-    # bag derivative
-    signature("recipewriterq.tasks.tasks.bag_derivatives", (taskid)).delay()
-    # create recipe file
-    signature("recipewriterq.tasks.tasks.derivative_recipe", (taskid, mmsid)).delay()
+    deriv_gen = signature("imageq.tasks.tasks.derivative_generation",
+                          kwargs={'bags': bag,
+                                  's3_bucket': s3_bucket,
+                                  's3_source': s3_source,
+                                  's3_destination': s3_derivative,
+                                  'outformat': outformat,
+                                  'filter': filter,
+                                  'scale': scale,
+                                  'crop': crop
+                                  })
+    # generate recipe files and process derivatives into bags
+    process_derivs = signature("recipewriterq.tasks.tasks.process_derivative", (mmsid))
     # load into islandora
-    #signature("islandoraq.tasks.tasks.ingest_recipe", (url, collection)).delay.get()
+    ingest_recipe = signature("islandoraq.tasks.tasks.ingest_recipe", (collection))
     # delete working files
+    # TODO: add cleanup task
+
+    chain = (deriv_gen | process_derivs | ingest_recipe)
+
+    return chain()
