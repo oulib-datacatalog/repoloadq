@@ -45,8 +45,6 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     process_derivs = signature("recipewriterq.tasks.tasks.process_derivative", (mmsid))
     # load into islandora
     ingest_recipe = signature("islandoraq.tasks.tasks.ingest_recipe", (collection))
-    # delete working files
-    # TODO: add cleanup task
 
     chain = (deriv_gen | process_derivs | ingest_recipe)
 
