@@ -47,5 +47,5 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     ingest_recipe = signature("islandoraq.tasks.tasks.ingest_recipe", (collection))
 
     chain = (deriv_gen | process_derivs | ingest_recipe)
-
-    return chain()
+    result = chain()
+    return result.get()
