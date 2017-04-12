@@ -43,9 +43,14 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
                                   })
     # generate recipe files and process derivatives into bags
     process_derivs = signature("recipewriterq.tasks.tasks.process_derivative", kwargs={'mmsid': mmsid})
-    # load into islandora
-    ingest_recipe = signature("islandoraq.tasks.tasks.ingest_recipe", kwargs={'collection': collection})
+    
+    # add entries to data catalog
 
-    chain = (deriv_gen | process_derivs | ingest_recipe)
+    
+    # load into islandora
+    #ingest_recipe = signature("islandoraq.tasks.tasks.ingest_recipe", kwargs={'collection': collection})
+
+    #chain = (deriv_gen | process_derivs | ingest_recipe)
+    chain = (deriv_gen | process_derivs)
     result = chain()
     return result.get()
