@@ -39,7 +39,8 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
                                   'outformat': outformat,
                                   'filter': filter,
                                   'scale': scale,
-                                  'crop': crop
+                                  'crop': crop,
+                                  'upload_s3': False  # derivatives will be uploaded later during recipewriterq's process_derivative task
                                   })
     # generate recipe files and process derivatives into bags
     process_derivs = signature("recipewriterq.tasks.tasks.process_derivative", kwargs={'mmsid': mmsid})
