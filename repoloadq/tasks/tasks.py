@@ -73,6 +73,7 @@ def bulkloader(json_params):
     """
     
     results = {}
+    return loads(json_params)
     for bag_entry in loads(json_params):
         bag_name = bag_entry.keys()[0]
         deriv_args = bag_entry.values()[0]
