@@ -1,7 +1,7 @@
 from celery.task import task
 from celery import Celery
 from celery import signature
-from json import loads
+#from json import loads
 
 import logging
 
@@ -73,8 +73,7 @@ def bulkloader(json_params):
     """
     
     results = {}
-    return json_params
-    for bag_entry in loads(json_params):
+    for bag_entry in json_params:
         bag_name = bag_entry.keys()[0]
         deriv_args = bag_entry.values()[0]
         mmsid = deriv_args['mmsid']
