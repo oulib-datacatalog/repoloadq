@@ -1,6 +1,7 @@
 from celery.task import task
 from celery import Celery
 from celery import signature
+from json import loads
 
 import logging
 
@@ -17,7 +18,7 @@ s3_derivative = "derivative"
 @task()
 def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=None, collection='islandora:bookCollection'):
     """
-    Generate derivative of Bag and load into Islandora.
+    Generate derivative of Bag and load into S3.
     
     args:
       bag: name of bag to load
@@ -55,3 +56,29 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     chain = (deriv_gen | process_derivs)
     result = chain()
     return result.get()
+
+
+@task()
+def bulkloader(json_params):
+    """
+    Bulk generate derivatives and load into S3.
+
+    args:
+       json_params (string): JSON formated list with the following structure:
+           [{"BagName": {"mmsid":"<valid MMSID>", "outformat":"<valid image format>", "scale":"<scale formated as a number from 000 to 100>"}}]
+    
+    Example:
+       [ { "Bacon_1620": { "mmsid":"99183353002042", "outformat":"jpeg", "scale":"040" } },
+         { "Baldi_1592": { "mmsid":"99173228002042", "outformat":"png", "scale":"020" } } ]
+    """
+    
+    results = {}
+    for bag_entry in loads(json_params):
+        bag_name = bag_entry.keys()[0]
+        deriv_args = bag_entry.values()[0]
+        mmsid = deriv_args['mmsid']
+        outformat = deriv_args['outformat']
+        scale = int(deriv_args['scale']) / 100.0
+        results[bag_name] = loadbook(bag=bag_name, mmsid=mmsid, outformat=outformat, scale=scale)
+
+    return {"results": results}
