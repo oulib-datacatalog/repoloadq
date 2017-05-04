@@ -55,7 +55,7 @@ def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=N
     #chain = (deriv_gen | process_derivs | ingest_recipe)
     chain = (deriv_gen | process_derivs)
     result = chain()
-    return result.get()
+    return "Kicked off tasks to generate derivative for {0}".format(bag)
 
 
 @task()
