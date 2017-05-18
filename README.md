@@ -1,4 +1,6 @@
 Repository Loader
 ====
 
-Generate derivatives of original bags and load into Islandora repository
+Bulk loader of derivatives into S3.
+Chains together the derivative generation process and the recipewriter process and runs asynchronously.
+
