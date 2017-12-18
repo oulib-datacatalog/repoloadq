@@ -16,7 +16,7 @@ s3_derivative = "derivative"
 
 
 @task()
-def loadbook(bag, mmsid, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=None, collection='islandora:bookCollection'):
+def loadbook(bag, mmsid=None, outformat="JPEG", filter="ANTIALIAS", scale=0.4, crop=None, collection='islandora:bookCollection'):
     """
     Generate derivative of Bag and load into S3.
     
@@ -76,7 +76,7 @@ def bulkloader(json_params):
     for bag_entry in json_params:
         bag_name = bag_entry.keys()[0]
         deriv_args = bag_entry.values()[0]
-        mmsid = deriv_args['mmsid']
+        mmsid = deriv_args.get('mmsid')  # if not set default to None
         outformat = deriv_args['outformat']
         scale = int(deriv_args['scale']) / 100.0
         results[bag_name] = loadbook(bag=bag_name, mmsid=mmsid, outformat=outformat, scale=scale)
